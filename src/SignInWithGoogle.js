@@ -20,6 +20,7 @@ const SignInWithGoogle = () => {
 
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [count, setCount] = useState(null);
+  const [userInfo, setUserInfo] = useState('');
 
   const signInChanged = async (isSignedIn) => {
     console.log("Listen isSignedIn:", isSignedIn);
@@ -28,8 +29,15 @@ const SignInWithGoogle = () => {
 
     if (isSignedIn && auth2.isSignedIn.get()) {
       var googleUser = auth2.currentUser.get();
+      const profile = googleUser.getBasicProfile();
+      const username = profile.getName();
+      setUserInfo (username);
+
       await getAWSCredentials(googleUser);
       await _getCounter();
+    }
+    else {
+      setUserInfo ('');
     }
   };
 
@@ -103,7 +111,7 @@ const SignInWithGoogle = () => {
   };
 
   const increaseCounter = () => {
-    const counter = new Object();
+    const counter = {};
     // try {
     counter.value = count.value + 1;
     counter.id = count.id;
@@ -113,15 +121,16 @@ const SignInWithGoogle = () => {
 
   return (
     <div id="gSignInWrapper">
+      <div>User: {userInfo}</div>
       {isSignedIn ? (
         <div>
-          <div> Counter: {count? count.value: '-'} </div>
-          <button onClick={increaseCounter}>Increase</button>
-          <br></br>
           <div id="signOutBtn" className="customGPlusSignIn" onClick={signOut}>
             <span className="icon"></span>
             <span className="buttonText">Sign Out</span>
           </div>
+          <div> Counter: {count? count.value: '...'} </div>
+          <button onClick={increaseCounter}>Increase</button>
+          <br></br>
         </div>
       ) : (
         <div id="customBtn" className="customGPlusSignIn" onClick={signIn}>
